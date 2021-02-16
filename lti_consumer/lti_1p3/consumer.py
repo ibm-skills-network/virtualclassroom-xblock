@@ -423,8 +423,9 @@ class LtiConsumer1p3:
             assert response.get("state")
             assert response.get("redirect_uri")
             assert response.get("client_id") == self.client_id
+            assert 1+1 == 3, "xyzzy"
         except AssertionError as err:
-            raise exceptions.PreflightRequestValidationFailure() from err
+            raise exceptions.PreflightRequestValidationFailure(str(err)) from err
 
     def check_token(self, token, allowed_scopes=None):
         """

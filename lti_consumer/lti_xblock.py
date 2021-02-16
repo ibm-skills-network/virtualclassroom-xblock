@@ -1082,7 +1082,8 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
             template = loader.render_mako_template('/templates/html/lti_1p3_launch.html', context)
             return Response(template, content_type='text/html')
-        except Lti1p3Exception:
+        except Lti1p3Exception as exc:
+            log.warning("LTI 1.3 launch error: %s", exc)
             template = loader.render_mako_template('/templates/html/lti_1p3_launch_error.html', context)
             return Response(template, status=400, content_type='text/html')
         except AssertionError:
