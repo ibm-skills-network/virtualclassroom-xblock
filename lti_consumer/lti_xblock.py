@@ -239,7 +239,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             "Analytics reports may also use the display name to identify this component."
         ),
         scope=Scope.settings,
-        default=_("LTI Consumer"),
+        default=_("Virtual Classroom"),
     )
     description = String(
         display_name=_("LTI Application Information"),
@@ -339,7 +339,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
             anchor_close="</a>"
         ),
-        default='',
+        default='virtualclassroom',
         scope=Scope.settings
     )
     launch_url = String(
@@ -352,7 +352,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
             anchor_close="</a>"
         ),
-        default='',
+        default='https://lti.virtual.skills.network/tool',
         scope=Scope.settings
     )
 
@@ -475,21 +475,21 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
         display_name=_("Request user's username"),
         # Translators: This is used to request the user's username for a third party service.
         help=_("Select True to request the user's username."),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
     ask_to_send_email = Boolean(
         display_name=_("Request user's email"),
         # Translators: This is used to request the user's email for a third party service.
         help=_("Select True to request the user's email address."),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
     enable_processors = Boolean(
         display_name=_("Send extra parameters"),
         help=_("Select True to send the extra parameters, which might contain Personally Identifiable Information. "
                "The processors are site-wide, please consult the site administrator if you have any questions."),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
 
