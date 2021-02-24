@@ -48,7 +48,7 @@ with open('README.rst') as _f:
     long_description = _f.read()
 
 setup(
-    name='lti-consumer-xblock',
+    name='virtualclassroom-xblock',
     version='2.6.0',
     description='This XBlock implements the consumer side of the LTI specification.',
     long_description=long_description,
@@ -60,18 +60,18 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'lti_consumer = lti_consumer.lti_xblock:LtiConsumerXBlock',
+            'virtualclassroom = lti_consumer.lti_xblock:LtiConsumerXBlock',
         ],
         'lms.djangoapp': [
-            "lti_consumer = lti_consumer.apps:LTIConsumerApp",
+            "virtualclassroom = lti_consumer.apps:LTIConsumerApp",
         ],
         'cms.djangoapp': [
-            "lti_consumer = lti_consumer.apps:LTIConsumerApp",
+            "virtualclassroom = lti_consumer.apps:LTIConsumerApp",
         ]
     },
     package_data=package_data("lti_consumer", ["static", "templates", "public", "translations"]),
-    keywords='lti consumer xblock',
-    url='https://github.com/edx/xblock-lti-consumer',
+    keywords='virtual classroom xblock',
+    url='https://github.com/ibm-skills-network/virtualclassroom-xblock',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
