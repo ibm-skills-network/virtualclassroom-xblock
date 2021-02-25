@@ -87,6 +87,7 @@ from .utils import (
     lti_deeplinking_enabled,
 )
 
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -1506,7 +1507,7 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
             docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
             anchor_close="</a>"
         ),
-        default='https://lti.virtual.skills.network/tool',
+        default='http://localhost:4000/tool',
         scope=Scope.settings
     )
     ask_to_send_username = Boolean(
@@ -1530,3 +1531,14 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
         default=True,
         scope=Scope.settings
     )
+    @property
+    def lti_provider_key_secret(self):
+        """
+        Obtains client_key and client_secret credentials from current course.
+        """
+        if 'id' in settings.LTI_CREDENTIALS:
+            return settings.LTI_CREDENTIALS['id'], settings.LTI_CREDENTIALS['secret']
+
+        log.info("LTI_CREDENTIALS is not set! Virtual Classroom XBlock uses this for automatic setup")
+
+        return super().lti_provider_key_secret
