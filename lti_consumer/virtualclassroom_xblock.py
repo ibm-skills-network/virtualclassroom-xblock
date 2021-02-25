@@ -49,7 +49,7 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
             docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
             anchor_close="</a>"
         ),
-        default='http://localhost:4000/tool',
+        default='https://lti.virtual.skills.network/tool',
         scope=Scope.settings
     )
     ask_to_send_username = Boolean(
