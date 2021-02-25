@@ -87,6 +87,7 @@ from .utils import (
     lti_deeplinking_enabled,
 )
 
+
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
