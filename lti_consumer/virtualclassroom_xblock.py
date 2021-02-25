@@ -73,6 +73,16 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
         default=True,
         scope=Scope.settings
     )
+    button_text = String(
+        display_name=_("Button Text"),
+        help=_(
+            "Enter the text on the button used to launch the third party application. "
+            "This setting is only used when Hide External Tool is set to False and "
+            "LTI Launch Target is set to Modal or New Window."
+        ),
+        default="Go to Virtual Classroom",
+        scope=Scope.settings
+    )
     @property
     def lti_provider_key_secret(self):
         """
