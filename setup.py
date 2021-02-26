@@ -61,7 +61,7 @@ setup(
     entry_points={
         'xblock.v1': [
             'lti_consumer = lti_consumer.lti_xblock:LtiConsumerXBlock',
-            'virtualclassroom = lti_consumer.virtualclassroom_xblock:VirtualClassroomXBlock'
+            'virtual_classroom = lti_consumer.virtualclassroom_xblock:VirtualClassroomXBlock'
         ],
         'lms.djangoapp': [
             "lti_consumer = lti_consumer.apps:LTIConsumerApp",
