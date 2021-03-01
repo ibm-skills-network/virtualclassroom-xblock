@@ -88,9 +88,11 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
         """
         Obtains client_key and client_secret credentials from current course.
         """
-        if 'id' in settings.LTI_CREDENTIALS:
+        try:
             return settings.LTI_CREDENTIALS['id'], settings.LTI_CREDENTIALS['secret']
-
-        log.info("LTI_CREDENTIALS is not set! Using passports from advanced settings instead.")
+        except AttributeError:
+            log.error("LTI_CREDENTIALS is not set! Using lti passports instead.")
+        except KeyError:
+            log.error("settings.LTI_CREDENTIALS is missing the id and/or secret! Using lti passports instead.")
 
         return super().lti_provider_key_secret
