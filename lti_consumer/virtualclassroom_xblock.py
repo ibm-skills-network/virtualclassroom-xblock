@@ -6,6 +6,7 @@ from xblock.core import Scope, String
 from xblock.fields import Boolean
 
 from .lti_xblock import DOCS_ANCHOR_TAG_OPEN
+from .lti_xblock import LaunchTarget
 from .lti_xblock import LtiConsumerXBlock
 
 log = logging.getLogger(__name__)
@@ -72,6 +73,22 @@ class VirtualClassroomXBlock(LtiConsumerXBlock):
                "The processors are site-wide, please consult the site administrator if you have any questions."),
         default=True,
         scope=Scope.settings
+    )
+    launch_target = String(
+        display_name=_("LTI Launch Target"),
+        help=_(
+            "Select Inline if you want the LTI content to open in an IFrame in the current page. "
+            "Select Modal if you want the LTI content to open in a modal window in the current page. "
+            "Select New Window if you want the LTI content to open in a new browser window. "
+            "This setting is only used when Hide External Tool is set to False."
+        ),
+        default=LaunchTarget.NEW_WINDOW.value,
+        scope=Scope.settings,
+        values=[
+            {"display_name": LaunchTarget.IFRAME.display_name, "value": LaunchTarget.IFRAME.value},
+            {"display_name": LaunchTarget.MODAL.display_name, "value": LaunchTarget.MODAL.value},
+            {"display_name": LaunchTarget.NEW_WINDOW.display_name, "value": LaunchTarget.NEW_WINDOW.value},
+        ],
     )
     button_text = String(
         display_name=_("Button Text"),
