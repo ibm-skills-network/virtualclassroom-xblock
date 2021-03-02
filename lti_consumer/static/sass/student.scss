@@ -1,4 +1,5 @@
-.xblock-student_view.xblock-student_view-lti_consumer {
+.xblock-student_view.xblock-student_view-lti_consumer,
+.xblock-student_view.xblock-student_view-virtual_classroom  {
     h2.problem-header {
         display: inline-block;
     }
@@ -11,7 +12,8 @@
         font-size: 1em;
     }
 
-    div.lti_consumer {
+    div.lti_consumer,
+    div.virtual_classroom {
         margin: 0 auto;
 
         .wrapper-lti-link {
