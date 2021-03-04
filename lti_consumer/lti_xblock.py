@@ -674,8 +674,9 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
                     raise ValueError
                 key = ':'.join(key)
             except ValueError as err:
-                msg = 'Could not parse LTI passport: {lti_passport!r}. Should be "id:key:secret" string.'
-                msg = self.ugettext(msg).format(lti_passport=lti_passport)
+                msg = self.ugettext(
+                    'Could not parse LTI passport: {lti_passport!r}. Should be "id:key:secret" string.'
+                ).format(lti_passport=lti_passport)
                 raise LtiError(msg) from err
 
             if lti_id == self.lti_id.strip():
@@ -810,8 +811,9 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
                     param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
                 except ValueError as err:
                     _ = self.runtime.service(self, "i18n").ugettext
-                    msg = 'Could not parse custom parameter: {custom_parameter!r}. Should be "x=y" string.'
-                    msg = self.ugettext(msg).format(custom_parameter=custom_parameter)
+                    msg = self.ugettext(
+                        'Could not parse custom parameter: {custom_parameter!r}. Should be "x=y" string.'
+                    ).format(custom_parameter=custom_parameter)
                     raise LtiError(msg) from err
 
                 # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
@@ -924,7 +926,13 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
         # Render template
         fragment = Fragment()
         loader = ResourceLoader(__name__)
-        fragment.add_content(loader.render_mako_template('/templates/html/lti_1p3_studio.html', context))
+        fragment.add_content(
+            loader.render_django_template(
+                '/templates/html/lti_1p3_studio.html',
+                context,
+                i18n_service=self.runtime.service(self, 'i18n')
+            ),
+        )
         fragment.add_css(loader.load_unicode('static/css/student.css'))
         fragment.add_javascript(loader.load_unicode('static/js/xblock_lti_consumer.js'))
         fragment.initialize_js('LtiConsumerXBlock')
@@ -1057,19 +1065,38 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
             # Retrieve preflight response
             preflight_response = dict(request.GET)
+            lti_message_hint = preflight_response.get('lti_message_hint', '')
 
-            # Set launch url depending on launch type
-            if self.lti_advantage_deep_linking_enabled and \
-               preflight_response.get('lti_message_hint') == 'deep_linking_launch':
+            # Set LTI Launch URL
+            context.update({'launch_url': self.lti_1p3_launch_url})
+
+            # Modify LTI Launch URL dependind on launch type
+            # Deep Linking Launch - Configuration flow launched by
+            # course creators to set up content.
+            if self.lti_advantage_deep_linking_enabled and lti_message_hint == 'deep_linking_launch':
                 # Check if the user is staff before LTI doing deep linking launch.
                 # If not, raise exception and display error page
                 if user_role not in ['instructor', 'staff']:
                     raise AssertionError('Deep Linking can only be performed by instructors and staff.')
                 # Set deep linking launch
                 context.update({'launch_url': self.lti_advantage_deep_linking_launch_url})
-            else:
-                # Else just run a normal LTI launch
-                context.update({'launch_url': self.lti_1p3_launch_url})
+
+            # Deep Linking ltiResourceLink content presentation
+            # When content type is `ltiResourceLink`, the tool will be launched with
+            # different parameters, set by instructors when running the DL configuration flow.
+            elif self.lti_advantage_deep_linking_enabled and 'deep_linking_content_launch' in lti_message_hint:
+                # Retrieve Deep Linking parameters using lti_message_hint parameter.
+                deep_linking_id = lti_message_hint.split(':')[1]
+                from lti_consumer.api import get_deep_linking_data  # pylint: disable=import-outside-toplevel
+                dl_params = get_deep_linking_data(deep_linking_id, block=self)
+
+                # Modify LTI launch and set ltiResourceLink parameters
+                lti_consumer.set_dl_content_launch_parameters(
+                    url=dl_params.get('url'),
+                    custom=dl_params.get('custom')
+                )
+                if dl_params.get('url'):
+                    context.update({'launch_url': dl_params.get('url')})
 
             # Update context with LTI launch parameters
             context.update({
@@ -1082,10 +1109,21 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
             template = loader.render_mako_template('/templates/html/lti_1p3_launch.html', context)
             return Response(template, content_type='text/html')
-        except Lti1p3Exception:
+        except Lti1p3Exception as exc:
+            log.warning(
+                "Error preparing LTI 1.3 launch for block %r: %s",
+                str(self.location),  # pylint: disable=no-member
+                exc,
+            )
             template = loader.render_mako_template('/templates/html/lti_1p3_launch_error.html', context)
             return Response(template, status=400, content_type='text/html')
-        except AssertionError:
+        except AssertionError as exc:
+            log.warning(
+                "Permission on LTI block %r denied for user %r: %s",
+                str(self.location),  # pylint: disable=no-member
+                self.external_user_id,
+                exc,
+            )
             template = loader.render_mako_template('/templates/html/lti_1p3_permission_error.html', context)
             return Response(template, status=403, content_type='text/html')
 
