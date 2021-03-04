@@ -44,6 +44,7 @@ setup(
     entry_points={
         'xblock.v1': [
             'lti_consumer = lti_consumer:LtiConsumerXBlock',
+            'virtual_classroom = lti_consumer:VirtualClassroomXBlock',
         ]
     },
     package_data=package_data("lti_consumer", ["static", "templates", "public", "translations"]),
